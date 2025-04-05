@@ -72,71 +72,84 @@ The SDK provides multiple ways to run your server:
 
 You can host this documentation on GitHub Pages by following these steps:
 
-1. **Create a `gh-pages` branch**
+1. **Create a GitHub Repository**
 
    ```bash
+   # Initialize a local repository if you haven't already
+   git init
+   git add .
+   git commit -m "Initial commit with MCP documentation"
+   
+   # Create a repository on GitHub through the web interface
+   # Then add the remote and push
+   git remote add origin https://github.com/yourusername/mcp_docs.git
+   git push -u origin main
+   ```
+
+2. **Set Up GitHub Pages**
+
+   There are two ways to set up GitHub Pages for your documentation:
+
+   ### Option 1: Using GitHub Actions (Recommended)
+
+   The repository already includes a GitHub Actions workflow at `.github/workflows/docs.yml` that will automatically build and deploy the documentation to GitHub Pages whenever you push to the main branch.
+
+   1. Go to your GitHub repository
+   2. Navigate to "Settings" > "Pages"
+   3. Under "Source", select "GitHub Actions"
+   4. Make sure the "GitHub Actions" workflow is running after your first push
+
+   ### Option 2: Manual Setup with gh-pages Branch
+
+   If you prefer to manage the deployment manually:
+
+   ```bash
+   # Create an orphan gh-pages branch
    git checkout --orphan gh-pages
    git rm -rf .
-   touch .nojekyll  # This tells GitHub not to process the site with Jekyll
+   touch .nojekyll
    git add .nojekyll
    git commit -m "Initial gh-pages commit"
    git push origin gh-pages
-   git checkout main  # Go back to your main branch
+   git checkout main
+   
+   # Build and copy the documentation to gh-pages
+   make html
+   git checkout gh-pages
+   cp -r _build/html/* .
+   git add .
+   git commit -m "Update documentation"
+   git push origin gh-pages
+   git checkout main
    ```
 
-2. **Create GitHub Actions Workflow**
+   Then go to your GitHub repository's Settings > Pages and select the gh-pages branch as the source.
 
-   Create a file `.github/workflows/docs.yml` with the following content:
-
-   ```yaml
-   name: Build and Deploy Documentation
-   
-   on:
-     push:
-       branches: [ main ]
-     workflow_dispatch:
-   
-   jobs:
-     build:
-       runs-on: ubuntu-latest
-       steps:
-         - uses: actions/checkout@v3
-         - name: Set up Python
-           uses: actions/setup-python@v4
-           with:
-             python-version: '3.10'
-         
-         - name: Install dependencies
-           run: |
-             python -m pip install --upgrade pip
-             pip install -r requirements.txt
-         
-         - name: Build documentation
-           run: |
-             make html
-         
-         - name: Deploy to GitHub Pages
-           uses: peaceiris/actions-gh-pages@v3
-           with:
-             github_token: ${{ secrets.GITHUB_TOKEN }}
-             publish_dir: ./_build/html
-             force_orphan: true
-             user_name: 'github-actions[bot]'
-             user_email: 'github-actions[bot]@users.noreply.github.com'
-   ```
-
-3. **Enable GitHub Pages**
-
-   - Go to your GitHub repository
-   - Navigate to Settings > Pages
-   - Under "Source", select "Deploy from a branch"
-   - Select the "gh-pages" branch and "/ (root)" folder
-   - Click "Save"
-
-4. **Access Your Documentation**
+3. **Access Your Documentation**
 
    Your documentation will be available at:
-   `https://[username].github.io/[repository-name]/`
+   `https://yourusername.github.io/mcp_docs/`
+
+4. **Update the Documentation**
+
+   Whenever you want to update the documentation:
+
+   ```bash
+   # If using GitHub Actions
+   # Just push your changes to the main branch
+   git add .
+   git commit -m "Update documentation"
+   git push origin main
+   
+   # If using manual gh-pages setup
+   make html
+   git checkout gh-pages
+   cp -r _build/html/* .
+   git add .
+   git commit -m "Update documentation"
+   git push origin gh-pages
+   git checkout main
+   ```
 
 ## Documentation Structure
 
